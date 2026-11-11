@@ -4,6 +4,8 @@ import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
 import org.firstinspires.ftc.teamcode.hardware.RobotHardware;
+
+@TeleOp(name = "Basic TeleOp", group = "TeleOp")
 public class BasicTeleOp extends LinearOpMode {
 
     private static final double TRIGGER_THRESHOLD = 0.1;
