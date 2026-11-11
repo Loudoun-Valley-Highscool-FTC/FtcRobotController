@@ -13,12 +13,15 @@ public class RobotHardware {
     public static final String LAUNCHER_NAME    = "launcher";
     public static final String LEFT_SERVO_NAME  = "frontLeft";
     public static final String RIGHT_SERVO_NAME = "frontRight";
+    public static final String GUIDER_NAME      = "guider";
 
     public static final double DRIVE_SPEED     = 0.8;
     public static final double INTAKE_POWER    = 1.0;
     public static final double LAUNCHER_POWER  = 1.0;
     public static final double SERVO_OPEN      = 1.0;
     public static final double SERVO_CLOSED    = 0.0;
+    public static final double GUIDER_FEED     = 1.0;
+    public static final double GUIDER_REST     = 0.0;
 
     private static final double ACCEL_RATE = 0.8;
     private static final double DECEL_RATE = 1.2;
@@ -30,6 +33,7 @@ public class RobotHardware {
     private DcMotor launcher;
     private Servo leftServo;
     private Servo rightServo;
+    private Servo guider;
 
     private double currentLeftPower = 0.0;
     private double currentRightPower = 0.0;
@@ -52,6 +56,7 @@ public class RobotHardware {
         launcher  = hardwareMap.get(DcMotor.class, LAUNCHER_NAME);
         leftServo  = hardwareMap.get(Servo.class, LEFT_SERVO_NAME);
         rightServo = hardwareMap.get(Servo.class, RIGHT_SERVO_NAME);
+        guider     = hardwareMap.get(Servo.class, GUIDER_NAME);
 
         backLeft.setDirection(DcMotorSimple.Direction.FORWARD);
         backRight.setDirection(DcMotorSimple.Direction.REVERSE);
@@ -172,6 +177,11 @@ public class RobotHardware {
         leftServo.setPosition(position);
         rightServo.setPosition(position);
     }
+    
+    public void guideAndShoot(boolean on) {
+        launcher.setPower(on ? LAUNCHER_POWER : 0);
+        guider.setPosition(on ? GUIDER_FEED : GUIDER_REST);
+    }
 
     public void stop() {
         currentLeftPower = 0;
@@ -184,5 +194,6 @@ public class RobotHardware {
         backRight.setPower(0);
         intake.setPower(0);
         launcher.setPower(0);
+        guider.setPosition(GUIDER_REST);
     }
 }

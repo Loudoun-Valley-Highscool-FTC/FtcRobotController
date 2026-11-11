@@ -2,15 +2,10 @@ package org.firstinspires.ftc.teamcode.opmodes.teleop;
 
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
-import com.qualcomm.robotcore.hardware.DcMotor;
 
 import org.firstinspires.ftc.teamcode.hardware.RobotHardware;
 
-<<<<<<< HEAD
-@TeleOp(name = "Basic TeleOp", group = "Competition")
-=======
 @TeleOp(name = "Basic TeleOp", group = "TeleOp")
->>>>>>> 095ab8e6f5f8c3bbe72334e6ed591235d8c94a09
 public class BasicTeleOp extends LinearOpMode {
 
     private static final double TRIGGER_THRESHOLD = 0.1;
@@ -20,8 +15,6 @@ public class BasicTeleOp extends LinearOpMode {
     @Override
     public void runOpMode() {
         robot.init();
-
-        DcMotor launcher = hardwareMap.get(DcMotor.class, "launcher");
 
         telemetry.addLine("Initialized. Press PLAY to start.");
         telemetry.update();
@@ -34,9 +27,9 @@ public class BasicTeleOp extends LinearOpMode {
             double turn  = gamepad1.right_stick_x;
             robot.arcadeDrive(drive, turn);
 
-            //launcher 
-            boolean launcherOn = gamepad1.right_bumper;
-            launcher.setPower(launcherOn ? 1 : 0);
+            //launcher + guider (L2 / left trigger = guide ball in and shoot)
+            boolean launcherOn = gamepad1.left_trigger > TRIGGER_THRESHOLD;
+            robot.guideAndShoot(launcherOn);
 
             //intake
             if (gamepad1.right_bumper) {
