@@ -20,12 +20,22 @@ public class RobotHardware {
     public static final double SERVO_OPEN      = 1.0;
     public static final double SERVO_CLOSED    = 0.0;
 
+    private static final double ACCEL_RATE = 0.8;
+    private static final double DECEL_RATE = 1.2;
+    private static final double REVERSAL_DELAY = 0.15;
+
     private DcMotor backLeft;
     private DcMotor backRight;
     private DcMotor intake;
     private DcMotor launcher;
     private Servo leftServo;
     private Servo rightServo;
+
+    private double currentLeftPower = 0.0;
+    private double currentRightPower = 0.0;
+    private double leftReverseUntil = 0.0;
+    private double rightReverseUntil = 0.0;
+    private long lastDriveTime = System.nanoTime();
 
     private final LinearOpMode opMode;
 
@@ -52,7 +62,6 @@ public class RobotHardware {
         stop();
     }
 
-
     public void arcadeDrive(double drive, double turn) {
         double leftPower  = drive + turn;
         double rightPower = drive - turn;
@@ -63,15 +72,77 @@ public class RobotHardware {
             rightPower /= max;
         }
 
-        backLeft.setPower(leftPower * DRIVE_SPEED);
-        backRight.setPower(rightPower * DRIVE_SPEED);
+        double targetLeft = leftPower * DRIVE_SPEED;
+        double targetRight = rightPower * DRIVE_SPEED;
+
+        long now = System.nanoTime();
+        double dt = Math.max(0.0, Math.min((now - lastDriveTime) / 1e9, 0.05));
+        lastDriveTime = now;
+        double time = now / 1e9;
+
+        if (currentLeftPower * targetLeft < 0) {
+            leftReverseUntil = -1;
+        }
+
+        if (currentRightPower * targetRight < 0) {
+            rightReverseUntil = -1;
+        }
+
+        if (leftReverseUntil != 0) {
+            if (Math.abs(currentLeftPower) > 0.001) {
+                targetLeft = 0;
+            } else {
+                currentLeftPower = 0;
+                if (leftReverseUntil < 0) {
+                    leftReverseUntil = time + REVERSAL_DELAY;
+                }
+                if (time < leftReverseUntil) {
+                    targetLeft = 0;
+                } else {
+                    leftReverseUntil = 0;
+                }
+            }
+        }
+
+        if (rightReverseUntil != 0) {
+            if (Math.abs(currentRightPower) > 0.001) {
+                targetRight = 0;
+            } else {
+                currentRightPower = 0;
+                if (rightReverseUntil < 0) {
+                    rightReverseUntil = time + REVERSAL_DELAY;
+                }
+                if (time < rightReverseUntil) {
+                    targetRight = 0;
+                } else {
+                    rightReverseUntil = 0;
+                }
+            }
+        }
+
+        currentLeftPower = rampPower(currentLeftPower, targetLeft, dt);
+        currentRightPower = rampPower(currentRightPower, targetRight, dt);
+
+        backLeft.setPower(currentLeftPower);
+        backRight.setPower(currentRightPower);
+    }
+
+    private double rampPower(double current, double target, double dt) {
+        double rate = Math.abs(target) > Math.abs(current)
+                ? ACCEL_RATE : DECEL_RATE;
+        double maxChange = rate * dt;
+        double difference = target - current;
+
+        if (Math.abs(difference) <= maxChange) {
+            return target;
+        }
+
+        return current + Math.copySign(maxChange, difference);
     }
 
     public void driveStraight(double power) {
-        backLeft.setPower(power);
-        backRight.setPower(power);
+        arcadeDrive(power, 0);
     }
-
 
     public void setIntakePower(double power) {
         intake.setPower(power);
@@ -81,7 +152,6 @@ public class RobotHardware {
         return intake.getPower();
     }
 
-
     public void setLauncherPower(double power) {
         launcher.setPower(power);
     }
@@ -89,7 +159,6 @@ public class RobotHardware {
     public double getLauncherPower() {
         return launcher.getPower();
     }
-
 
     public void openServos() {
         setServoPositions(SERVO_OPEN);
@@ -104,8 +173,13 @@ public class RobotHardware {
         rightServo.setPosition(position);
     }
 
-
     public void stop() {
+        currentLeftPower = 0;
+        currentRightPower = 0;
+        leftReverseUntil = 0;
+        rightReverseUntil = 0;
+        lastDriveTime = System.nanoTime();
+
         backLeft.setPower(0);
         backRight.setPower(0);
         intake.setPower(0);
