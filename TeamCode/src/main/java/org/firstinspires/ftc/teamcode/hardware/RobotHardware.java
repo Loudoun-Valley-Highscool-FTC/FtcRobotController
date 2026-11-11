@@ -80,8 +80,8 @@ public class RobotHardware {
         lastDriveTime = now;
         double time = now / 1e9;
 
-        if (currentLeftPower * targetLeft < 0) {
-            leftReverseUntil = -1;
+        if (leftReverseUntil == 0 && currentLeftPower * targetLeft < 0) {
+        leftReverseUntil = -1;
         }
 
         if (currentRightPower * targetRight < 0) {
