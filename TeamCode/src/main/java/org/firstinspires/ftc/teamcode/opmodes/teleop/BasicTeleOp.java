@@ -6,7 +6,11 @@ import com.qualcomm.robotcore.hardware.DcMotor;
 
 import org.firstinspires.ftc.teamcode.hardware.RobotHardware;
 
+<<<<<<< HEAD
 @TeleOp(name = "Basic TeleOp", group = "Competition")
+=======
+@TeleOp(name = "Basic TeleOp", group = "TeleOp")
+>>>>>>> 095ab8e6f5f8c3bbe72334e6ed591235d8c94a09
 public class BasicTeleOp extends LinearOpMode {
 
     private static final double TRIGGER_THRESHOLD = 0.1;
