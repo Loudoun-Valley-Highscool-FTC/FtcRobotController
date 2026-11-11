@@ -27,7 +27,7 @@ public class BasicTeleOp extends LinearOpMode {
             double turn  = gamepad1.right_stick_x;
             robot.arcadeDrive(drive, turn);
 
-            //launcher + guider (L2 / left trigger = guide ball in and shoot)
+            //launcher
             boolean launcherOn = gamepad1.left_trigger > TRIGGER_THRESHOLD;
             robot.guideAndShoot(launcherOn);
 

@@ -183,6 +183,15 @@ public class RobotHardware {
         guider.setPosition(on ? GUIDER_FEED : GUIDER_REST);
     }
 
+    /** Moves the guider servo to a raw position (0.0 - 1.0). Used for tuning/tests. */
+    public void setGuiderPosition(double position) {
+        guider.setPosition(position);
+    }
+
+    public double getGuiderPosition() {
+        return guider.getPosition();
+    }
+
     public void stop() {
         currentLeftPower = 0;
         currentRightPower = 0;
