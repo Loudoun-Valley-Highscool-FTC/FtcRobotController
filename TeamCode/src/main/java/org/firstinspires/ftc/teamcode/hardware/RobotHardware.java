@@ -17,7 +17,7 @@ public class RobotHardware {
 
     public static final double DRIVE_SPEED     = 0.8;
     public static final double INTAKE_POWER    = 1.0;
-    public static final double LAUNCHER_POWER  = 1.0;
+    public static final double LAUNCHER_POWER  = 1.0;  //1.0;
     public static final double SERVO_OPEN      = 1.0;
     public static final double SERVO_CLOSED    = 0.0;
     public static final double GUIDER_FEED     = 1.0;
@@ -182,8 +182,15 @@ public class RobotHardware {
         launcher.setPower(on ? LAUNCHER_POWER : 0);
         guider.setPosition(on ? GUIDER_FEED : GUIDER_REST);
     }
+    public void Shoot(boolean on) {
+        launcher.setPower(on ? LAUNCHER_POWER : 0);
+    }
 
-    /** Moves the guider servo to a raw position (0.0 - 1.0). Used for tuning/tests. */
+    public void feed(boolean on) {
+        guider.setPosition(on ? GUIDER_FEED : GUIDER_REST);
+    }
+
+
     public void setGuiderPosition(double position) {
         guider.setPosition(position);
     }

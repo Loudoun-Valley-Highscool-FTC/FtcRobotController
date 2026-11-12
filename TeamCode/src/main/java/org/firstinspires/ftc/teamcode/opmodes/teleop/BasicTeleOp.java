@@ -27,9 +27,13 @@ public class BasicTeleOp extends LinearOpMode {
             double turn  = gamepad1.right_stick_x;
             robot.arcadeDrive(drive, turn);
 
-            //launcher
-            boolean launcherOn = gamepad1.left_trigger > TRIGGER_THRESHOLD;
-            robot.guideAndShoot(launcherOn);
+            //shooter rev (right trigger)
+            boolean revUp = gamepad1.right_trigger > TRIGGER_THRESHOLD;
+            robot.Shoot(revUp);
+
+            //guide/feed ball into shooter (left trigger)
+            boolean feeding = gamepad1.left_trigger > TRIGGER_THRESHOLD;
+            robot.feed(feeding);
 
             //intake
             if (gamepad1.right_bumper) {
@@ -51,7 +55,8 @@ public class BasicTeleOp extends LinearOpMode {
             //telemetry
             telemetry.addData("Drive", "%.2f", drive);
             telemetry.addData("Turn", "%.2f", turn);
-            telemetry.addData("Launcher", launcherOn ? "ON" : "off");
+            telemetry.addData("Shooter", revUp ? "REVVING" : "off");
+            telemetry.addData("Feed", feeding ? "ON" : "off");
             telemetry.addData("Intake", "%.2f", robot.getIntakePower());
             telemetry.update();
         }
