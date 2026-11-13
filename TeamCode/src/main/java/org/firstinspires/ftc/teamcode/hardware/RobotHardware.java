@@ -18,13 +18,16 @@ public class RobotHardware {
     public static final double DRIVE_SPEED     = 0.8;
     public static final double INTAKE_POWER    = 1.0;
     public static final double LAUNCHER_POWER  = 1.0;  //1.0;
+    public static final double LAUNCHER_POWER_STEP = 0.05;
+    public static final double LAUNCHER_POWER_MIN  = 0.0;
+    public static final double LAUNCHER_POWER_MAX  = 1.0;
     public static final double SERVO_OPEN      = 1.0;
     public static final double SERVO_CLOSED    = 0.0;
     public static final double GUIDER_FEED     = 1.0;
     public static final double GUIDER_REST     = 0.0;
 
-    private static final double ACCEL_RATE = 0.8;
-    private static final double DECEL_RATE = 1.2;
+    private static final double ACCEL_RATE = 2.5;
+    private static final double DECEL_RATE = 5.0;
     private static final double REVERSAL_DELAY = 0.15;
 
     private DcMotor backLeft;
@@ -34,6 +37,8 @@ public class RobotHardware {
     private Servo leftServo;
     private Servo rightServo;
     private Servo guider;
+
+    private double launcherPower = LAUNCHER_POWER;
 
     private double currentLeftPower = 0.0;
     private double currentRightPower = 0.0;
@@ -60,6 +65,7 @@ public class RobotHardware {
 
         backLeft.setDirection(DcMotorSimple.Direction.FORWARD);
         backRight.setDirection(DcMotorSimple.Direction.REVERSE);
+        intake.setDirection(DcMotorSimple.Direction.REVERSE);
 
         backLeft.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         backRight.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
@@ -179,11 +185,20 @@ public class RobotHardware {
     }
     
     public void guideAndShoot(boolean on) {
-        launcher.setPower(on ? LAUNCHER_POWER : 0);
+        launcher.setPower(on ? launcherPower : 0);
         guider.setPosition(on ? GUIDER_FEED : GUIDER_REST);
     }
     public void Shoot(boolean on) {
-        launcher.setPower(on ? LAUNCHER_POWER : 0);
+        launcher.setPower(on ? launcherPower : 0);
+    }
+
+    public void changeLauncherPower(double delta) {
+        launcherPower = Math.max(LAUNCHER_POWER_MIN,
+                Math.min(LAUNCHER_POWER_MAX, launcherPower + delta));
+    }
+
+    public double getLauncherSetPower() {
+        return launcherPower;
     }
 
     public void feed(boolean on) {
