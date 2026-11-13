@@ -9,6 +9,8 @@ import org.firstinspires.ftc.teamcode.hardware.RobotHardware;
 public class BasicTeleOp extends LinearOpMode {
 
     private static final double TRIGGER_THRESHOLD = 0.5;
+    private static final double STICK_DEADBAND = 0.05;
+    private static final double TURN_SCALE = 0.65;
 
     private final RobotHardware robot = new RobotHardware(this);
 
@@ -35,8 +37,8 @@ public class BasicTeleOp extends LinearOpMode {
         waitForStart();
 
         while (opModeIsActive()) {
-            double drive = -gamepad1.left_stick_y;
-            double turn  = gamepad1.right_stick_x;
+            double drive = shape(-gamepad1.left_stick_y);
+            double turn  = shape(gamepad1.right_stick_x) * TURN_SCALE;
             robot.arcadeDrive(drive, turn);
 
             boolean intakeButton = gamepad1.left_trigger > TRIGGER_THRESHOLD;
@@ -88,5 +90,12 @@ public class BasicTeleOp extends LinearOpMode {
         }
 
         robot.stop();
+    }
+
+    private static double shape(double   value) {
+        if (Math.abs(value) < STICK_DEADBAND) {
+            return 0.0;
+        }
+        return Math.copySign(value * value, value);
     }
 }

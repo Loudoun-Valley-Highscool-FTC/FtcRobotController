@@ -26,8 +26,8 @@ public class RobotHardware {
     public static final double GUIDER_FEED     = 1.0;
     public static final double GUIDER_REST     = 0.0;
 
-    private static final double ACCEL_RATE = 0.8;
-    private static final double DECEL_RATE = 1.2;
+    private static final double ACCEL_RATE = 2.5;
+    private static final double DECEL_RATE = 5.0;
     private static final double REVERSAL_DELAY = 0.15;
 
     private DcMotor backLeft;
@@ -65,6 +65,7 @@ public class RobotHardware {
 
         backLeft.setDirection(DcMotorSimple.Direction.FORWARD);
         backRight.setDirection(DcMotorSimple.Direction.REVERSE);
+        intake.setDirection(DcMotorSimple.Direction.REVERSE);
 
         backLeft.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         backRight.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
