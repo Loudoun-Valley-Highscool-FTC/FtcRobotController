@@ -1,10 +1,13 @@
 package org.firstinspires.ftc.teamcode.hardware;
 
+import com.qualcomm.hardware.rev.RevHubOrientationOnRobot;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.HardwareMap;
+import com.qualcomm.robotcore.hardware.IMU;
 import com.qualcomm.robotcore.hardware.Servo;
+import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 
 public class RobotHardware {
     public static final String BACK_LEFT_NAME   = "backLeft";
@@ -14,6 +17,7 @@ public class RobotHardware {
     public static final String LEFT_SERVO_NAME  = "frontLeft";
     public static final String RIGHT_SERVO_NAME = "frontRight";
     public static final String GUIDER_NAME      = "guider";
+    public static final String IMU_NAME         = "imu";
 
     public static final double DRIVE_SPEED     = 0.8;
     public static final double INTAKE_POWER    = 1.0;
@@ -37,6 +41,7 @@ public class RobotHardware {
     private Servo leftServo;
     private Servo rightServo;
     private Servo guider;
+    private IMU imu;
 
     private double launcherPower = LAUNCHER_POWER;
 
@@ -62,6 +67,20 @@ public class RobotHardware {
         leftServo  = hardwareMap.get(Servo.class, LEFT_SERVO_NAME);
         rightServo = hardwareMap.get(Servo.class, RIGHT_SERVO_NAME);
         guider     = hardwareMap.get(Servo.class, GUIDER_NAME);
+
+        try {
+            imu = hardwareMap.get(IMU.class, IMU_NAME);
+            IMU.Parameters parameters = new IMU.Parameters(
+                new RevHubOrientationOnRobot(
+                    RevHubOrientationOnRobot.LogoFacingDirection.UP,
+                    RevHubOrientationOnRobot.UsbFacingDirection.FORWARD
+                )
+            );
+            imu.initialize(parameters);
+        } catch (Exception e) {
+            // Soft fallback if IMU is not configured in current HardwareMap
+            imu = null;
+        }
 
         backLeft.setDirection(DcMotorSimple.Direction.FORWARD);
         backRight.setDirection(DcMotorSimple.Direction.REVERSE);
@@ -226,5 +245,18 @@ public class RobotHardware {
         intake.setPower(0);
         launcher.setPower(0);
         guider.setPosition(GUIDER_REST);
+    }
+
+    public double getHeadingDegrees() {
+        if (imu != null) {
+            return imu.getRobotYawPitchRollAngles().getYaw(AngleUnit.DEGREES);
+        }
+        return 0.0;
+    }
+
+    public void resetHeading() {
+        if (imu != null) {
+            imu.resetYaw();
+        }
     }
 }

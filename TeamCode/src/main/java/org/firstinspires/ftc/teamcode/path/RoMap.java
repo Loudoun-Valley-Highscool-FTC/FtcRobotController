@@ -6,6 +6,62 @@ import java.util.Locale;
 
 public class RoMap {
 
+    public static class Obstacle {
+        public final String name;
+        public final double centerX, centerY;
+        public final double width, height;
+        public final double minX, maxX, minY, maxY;
+
+         //Creates an Obstacle using center coordinates (centerX, centerY) and dimensions (width, height).
+
+        public Obstacle(String name, double centerX, double centerY, double width, double height) {
+            this.name = name;
+            this.centerX = centerX;
+            this.centerY = centerY;
+            this.width = width;
+            this.height = height;
+
+            double halfWidth = width / 2.0;
+            double halfHeight = height / 2.0;
+            this.minX = centerX - halfWidth;
+            this.maxX = centerX + halfWidth;
+            this.minY = centerY - halfHeight;
+            this.maxY = centerY + halfHeight;
+        }
+
+        public boolean contains(double x, double y) {
+            return x >= minX && x <= maxX && y >= minY && y <= maxY;
+        }
+
+        public boolean intersectsSegment(double x1, double y1, double x2, double y2) {
+            if (contains(x1, y1) || contains(x2, y2)) return true;
+
+            double dx = x2 - x1;
+            double dy = y2 - y1;
+            double tMin = 0.0;
+            double tMax = 1.0;
+
+            double[] p = {-dx, dx, -dy, dy};
+            double[] q = {x1 - minX, maxX - x1, y1 - minY, maxY - y1};
+
+            for (int i = 0; i < 4; i++) {
+                if (p[i] == 0) {
+                    if (q[i] < 0) return false;
+                } else {
+                    double t = q[i] / p[i];
+                    if (p[i] < 0) {
+                        if (t > tMax) return false;
+                        if (t > tMin) tMin = t;
+                    } else {
+                        if (t < tMin) return false;
+                        if (t < tMax) tMax = t;
+                    }
+                }
+            }
+            return tMin <= tMax;
+        }
+    }
+
 
 
     public static class MovementStep {
@@ -32,27 +88,42 @@ public class RoMap {
     private final double fieldSizeMeters;
     private final Position2D homePosition;
     private Position2D currentPosition;
-
-    /*
-     * private final double obstacleSafetyMargin;
-     * 
-     * public RoMap(double fieldSizeMeters, Position2D homePosition, double obstacleSafetyMargin) {
-     *     this.fieldSizeMeters = fieldSizeMeters;
-     *     this.homePosition = homePosition;
-     *     this.obstacleSafetyMargin = obstacleSafetyMargin;
-     */
+    private final List<Obstacle> obstacles;
 
     public RoMap(double fieldSizeMeters, Position2D homePosition) {
         this.fieldSizeMeters = fieldSizeMeters;
         this.homePosition = homePosition;
         this.currentPosition = homePosition;
+        this.obstacles = new ArrayList<>();
     }
 
-    public void recordMovement(double headingDegrees, double speed, double timeSeconds) {
-        recordMovement(new Position2D(0, 0, headingDegrees), speed, timeSeconds);
+    public void addObstacle(Obstacle obstacle) {
+        obstacles.add(obstacle);
     }
 
-    public void recordMovement(Position2D stepDirection, double speed, double timeSeconds) {
+    public void addObstacle(String name, double centerX, double centerY, double width, double height) {
+        obstacles.add(new Obstacle(name, centerX, centerY, width, height));
+    }
+
+    public boolean isPathClear(Position2D start, Position2D end) {
+        for (int i = 0; i < obstacles.size(); i++) {
+            if (obstacles.get(i).intersectsSegment(start.getX(), start.getY(), end.getX(), end.getY())) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    public List<Obstacle> getObstacles() {
+        return obstacles;
+    }
+
+    public void updatePosition(double headingDegrees, double speed, double timeSeconds) {
+        updatePosition(new Position2D(0, 0, headingDegrees), speed, timeSeconds);
+    }
+
+    // Updates live position with vector calculations
+    public void updatePosition(Position2D stepDirection, double speed, double timeSeconds) {
         MovementStep step = new MovementStep(stepDirection, speed, timeSeconds);
 
         double dx = step.distance * stepDirection.getCos();
@@ -67,6 +138,15 @@ public class RoMap {
         }
 
         currentPosition = nextPosition;
+    }
+
+    // Alias for updating position
+    public void recordMovement(double headingDegrees, double speed, double timeSeconds) {
+        updatePosition(headingDegrees, speed, timeSeconds);
+    }
+
+    public void recordMovement(Position2D stepDirection, double speed, double timeSeconds) {
+        updatePosition(stepDirection, speed, timeSeconds);
     }
 
     //as crow flies

@@ -17,8 +17,9 @@ public class PathTrackerTestOpMode extends LinearOpMode {
         RobotHardware robot = new RobotHardware(this);
         robot.init();
 
-        Position2D homePosition = new Position2D(0, 0, 0);
-        RoMap map = new RoMap(3.6576, homePosition);
+        // 12x12 ft field with starting home position at (-6, -6)
+        Position2D homePosition = new Position2D(-6.0, -6.0, 0.0);
+        RoMap map = new RoMap(12.0, homePosition);
 
         waitForStart();
 
@@ -32,9 +33,9 @@ public class PathTrackerTestOpMode extends LinearOpMode {
             double turn  = gamepad1.left_stick_x * 0.5;
             robot.arcadeDrive(drive, turn);
 
-            // Button A: Record step
+            // Button A: Update position
             if (gamepad1.a && !aPressedLast) {
-                map.recordMovement(0.0, 0.5, 1.0);
+                map.updatePosition(0.0, 0.5, 1.0);
             }
             aPressedLast = gamepad1.a;
 

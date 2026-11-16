@@ -16,17 +16,18 @@ public class ReturnToHomeAuto extends LinearOpMode {
         RobotHardware robot = new RobotHardware(this);
         robot.init();
 
-        Position2D homePosition = new Position2D(0.0, 0.0, 0.0);
-        RoMap map = new RoMap(3.6576, homePosition);
+        // 12x12 ft field with starting home position at (-6, -6)
+        Position2D homePosition = new Position2D(-6.0, -6.0, 0.0);
+        RoMap map = new RoMap(12.0, homePosition);
 
         waitForStart();
 
         // --- OUTBOUND MOVEMENT ---
-        map.recordMovement(45.0, 0.5, 2.0);
+        map.updatePosition(45.0, 0.5, 2.0);
         robot.arcadeDrive(0.5, 0.5);
         sleep(2000);
 
-        map.recordMovement(90.0, 0.4, 1.5);
+        map.updatePosition(90.0, 0.4, 1.5);
         robot.arcadeDrive(0.4, 0.0);
         sleep(1500);
 

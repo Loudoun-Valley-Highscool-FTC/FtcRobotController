@@ -68,22 +68,22 @@ public class FTCPathTrackerUnitTest extends LinearOpMode {
         RoMap map = new RoMap(3.6576, origin);
 
         // Move 1m at 0° (Forward along +X)
-        map.recordMovement(0.0, 1.0, 1.0);
+        map.updatePosition(0.0, 1.0, 1.0);
         assertEquals(1.0, map.getCurrentPosition().getX(), 0.001);
         assertEquals(0.0, map.getCurrentPosition().getY(), 0.001);
 
         // Move 1m at 90° (Left along +Y)
-        map.recordMovement(90.0, 1.0, 1.0);
+        map.updatePosition(90.0, 1.0, 1.0);
         assertEquals(1.0, map.getCurrentPosition().getX(), 0.001);
         assertEquals(1.0, map.getCurrentPosition().getY(), 0.001);
 
         // Move 1m at 180° (Backward along -X)
-        map.recordMovement(180.0, 1.0, 1.0);
+        map.updatePosition(180.0, 1.0, 1.0);
         assertEquals(0.0, map.getCurrentPosition().getX(), 0.001);
         assertEquals(1.0, map.getCurrentPosition().getY(), 0.001);
 
         // Move 1m at 270° / -90° (Right along -Y)
-        map.recordMovement(270.0, 1.0, 1.0);
+        map.updatePosition(270.0, 1.0, 1.0);
         assertEquals(0.0, map.getCurrentPosition().getX(), 0.001);
         assertEquals(0.0, map.getCurrentPosition().getY(), 0.001);
 
@@ -91,14 +91,14 @@ public class FTCPathTrackerUnitTest extends LinearOpMode {
     }
 
     public static void testDirectRoute(Telemetry telemetry) {
-        Position2D home = new Position2D(0, 0, 0);
-        RoMap map = new RoMap(3.6576, home);
+        Position2D home = new Position2D(-6.0, -6.0, 0.0);
+        RoMap map = new RoMap(12.0, home);
 
-        // Robot moves to (2.0, 2.0)
-        map.recordMovement(45.0, Math.sqrt(8.0), 1.0);
+        // Robot moves to (-4.0, -4.0)
+        map.updatePosition(45.0, Math.sqrt(8.0), 1.0);
 
-        assertEquals(2.0, map.getCurrentPosition().getX(), 0.01);
-        assertEquals(2.0, map.getCurrentPosition().getY(), 0.01);
+        assertEquals(-4.0, map.getCurrentPosition().getX(), 0.01);
+        assertEquals(-4.0, map.getCurrentPosition().getY(), 0.01);
 
         List<RoMap.MovementStep> returnSteps = map.calculateDirectRoute(1.0);
 
@@ -112,10 +112,10 @@ public class FTCPathTrackerUnitTest extends LinearOpMode {
     }
 
     public static void testEdgeRoute(Telemetry telemetry) {
-        Position2D home = new Position2D(0, 0, 0);
-        RoMap map = new RoMap(3.6576, home);
+        Position2D home = new Position2D(-6.0, -6.0, 0.0);
+        RoMap map = new RoMap(12.0, home);
 
-        map.recordMovement(45.0, Math.sqrt(8.0), 1.0);
+        map.updatePosition(45.0, Math.sqrt(8.0), 1.0);
 
         List<RoMap.MovementStep> returnSteps = map.calculateEdgeRoute(1.0);
 
@@ -130,7 +130,7 @@ public class FTCPathTrackerUnitTest extends LinearOpMode {
         RoMap map = new RoMap(2.0, home);
 
         try {
-            map.recordMovement(0.0, 5.0, 1.0);
+            map.updatePosition(0.0, 5.0, 1.0);
             throw new RuntimeException("Test Failed: Should have thrown IllegalArgumentException!");
         } catch (IllegalArgumentException e) {
             log(telemetry, "✓ Field Boundary Check PASSED");
