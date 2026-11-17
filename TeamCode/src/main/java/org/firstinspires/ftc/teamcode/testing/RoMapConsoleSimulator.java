@@ -14,7 +14,7 @@ import java.util.Scanner;
  * or 'RTH' (Return To Home) in the terminal and renders a visual ASCII field map.
  */
 public class RoMapConsoleSimulator {
-
+//gemini test code works but run file directly
     private static final double FIELD_SIZE_FEET = 12.0;
     private static final Position2D HOME_POSITION = new Position2D(-6.0, -6.0, 0.0);
     private static final int GRID_SIZE = 13; // 13x13 ASCII grid
