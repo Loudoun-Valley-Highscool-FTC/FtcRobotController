@@ -3,6 +3,7 @@ package org.firstinspires.ftc.teamcode.hardware;
 import com.qualcomm.hardware.rev.RevHubOrientationOnRobot;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
+import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.IMU;
@@ -88,6 +89,12 @@ public class RobotHardware {
 
         backLeft.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         backRight.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+
+        //speed test maybe work
+        try {
+            backLeft.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+            backRight.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+        } catch (Exception ignored) {}
 
         stop();
     }
@@ -258,5 +265,22 @@ public class RobotHardware {
         if (imu != null) {
             imu.resetYaw();
         }
+    }
+
+    //speed test maybe work
+    public static final double TICKS_PER_REV = 537.7;
+    public static final double WHEEL_DIAMETER_FEET = 0.246;
+
+    //speed test maybe work
+    public double getEncoderSpeed() {
+        try {
+            if (backLeft instanceof DcMotorEx && backRight instanceof DcMotorEx) {
+                double leftVel = Math.abs(((DcMotorEx) backLeft).getVelocity());
+                double rightVel = Math.abs(((DcMotorEx) backRight).getVelocity());
+                double avgVel = (leftVel + rightVel) / 2.0;
+                return (avgVel / TICKS_PER_REV) * (Math.PI * WHEEL_DIAMETER_FEET);
+            }
+        } catch (Exception ignored) {}
+        return 0.0;
     }
 }

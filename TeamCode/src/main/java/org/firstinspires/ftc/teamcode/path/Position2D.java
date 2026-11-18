@@ -87,6 +87,6 @@ public class Position2D {
 
     @Override
     public String toString() {
-        return String.format(Locale.US, "Position2D(X: %.2fm, Y: %.2fm, Heading: %.1f°)", x, y, headingDegrees);
+        return String.format(Locale.US, "Position2D(X: %.2fft, Y: %.2fft, Heading: %.1f deg)", x, y, headingDegrees);
     }
 }

@@ -67,27 +67,27 @@ public class FTCPathTrackerUnitTest extends LinearOpMode {
         Position2D origin = new Position2D(0, 0, 0);
         RoMap map = new RoMap(3.6576, origin);
 
-        // Move 1m at 0° (Forward along +X)
+        // Move 1m at 0 deg (Forward along +X)
         map.updatePosition(0.0, 1.0, 1.0);
         assertEquals(1.0, map.getCurrentPosition().getX(), 0.001);
         assertEquals(0.0, map.getCurrentPosition().getY(), 0.001);
 
-        // Move 1m at 90° (Left along +Y)
+        // Move 1m at 90 deg (Left along +Y)
         map.updatePosition(90.0, 1.0, 1.0);
         assertEquals(1.0, map.getCurrentPosition().getX(), 0.001);
         assertEquals(1.0, map.getCurrentPosition().getY(), 0.001);
 
-        // Move 1m at 180° (Backward along -X)
+        // Move 1m at 180 deg (Backward along -X)
         map.updatePosition(180.0, 1.0, 1.0);
         assertEquals(0.0, map.getCurrentPosition().getX(), 0.001);
         assertEquals(1.0, map.getCurrentPosition().getY(), 0.001);
 
-        // Move 1m at 270° / -90° (Right along -Y)
+        // Move 1m at 270 deg / -90 deg (Right along -Y)
         map.updatePosition(270.0, 1.0, 1.0);
         assertEquals(0.0, map.getCurrentPosition().getX(), 0.001);
         assertEquals(0.0, map.getCurrentPosition().getY(), 0.001);
 
-        log(telemetry, "✓ 360-Degree Vector Decomposition PASSED");
+        log(telemetry, "[PASS] 360-Degree Vector Decomp PASSED");
     }
 
     public static void testDirectRoute(Telemetry telemetry) {
@@ -108,7 +108,7 @@ public class FTCPathTrackerUnitTest extends LinearOpMode {
         assertEquals(-135.0, returnStep.getHeadingDegrees(), 0.1);
         assertEquals(Math.sqrt(8.0), returnStep.distance, 0.01);
 
-        log(telemetry, "✓ Direct Vector Route PASSED");
+        log(telemetry, "[PASS] Direct Vector Route PASSED");
     }
 
     public static void testEdgeRoute(Telemetry telemetry) {
@@ -122,7 +122,7 @@ public class FTCPathTrackerUnitTest extends LinearOpMode {
         // Edge route generates 3 perimeter steps
         assertEquals(3, returnSteps.size());
 
-        log(telemetry, "✓ Edge of the Map Perimeter Route PASSED");
+        log(telemetry, "[PASS] Edge of the Map Perimeter Route PASSED");
     }
 
     public static void testBoundaryCheck(Telemetry telemetry) {
@@ -133,7 +133,7 @@ public class FTCPathTrackerUnitTest extends LinearOpMode {
             map.updatePosition(0.0, 5.0, 1.0);
             throw new RuntimeException("Test Failed: Should have thrown IllegalArgumentException!");
         } catch (IllegalArgumentException e) {
-            log(telemetry, "✓ Field Boundary Check PASSED");
+            log(telemetry, "[PASS] Field Boundary Check PASSED");
         }
     }
 

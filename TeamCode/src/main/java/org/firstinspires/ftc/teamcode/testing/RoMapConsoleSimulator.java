@@ -14,7 +14,7 @@ import java.util.Scanner;
  * or 'RTH' (Return To Home) in the terminal and renders a visual ASCII field map.
  */
 public class RoMapConsoleSimulator {
-//gemini test code works but run file directly
+
     private static final double FIELD_SIZE_FEET = 12.0;
     private static final Position2D HOME_POSITION = new Position2D(-6.0, -6.0, 0.0);
     private static final int GRID_SIZE = 13; // 13x13 ASCII grid
@@ -53,7 +53,7 @@ public class RoMapConsoleSimulator {
 
                 if (commandUpper.equals("RESET")) {
                     map = new RoMap(FIELD_SIZE_FEET, HOME_POSITION);
-                    System.out.println("✓ Map reset back to Home (-6, -6).");
+                    System.out.println("[OK] Map reset back to Home (-6, -6).");
                     drawFieldMap(map);
                     continue;
                 }
@@ -76,10 +76,10 @@ public class RoMapConsoleSimulator {
     private static void runAutomatedDemo(RoMap map) {
         System.out.println("\n--- RUNNING AUTOMATED DEMONSTRATION MODE ---");
         
-        System.out.println("\n>>> Step 1: Move outbound (Speed=0.5, Time=2.0s, Angle=45.0°)");
+        System.out.println("\n>>> Step 1: Move outbound (Speed=0.5, Time=2.0s, Angle=45.0 deg)");
         handleMovementCommand(map, "0.5 2.0 45");
 
-        System.out.println("\n>>> Step 2: Move outbound (Speed=0.4, Time=3.0s, Angle=90.0°)");
+        System.out.println("\n>>> Step 2: Move outbound (Speed=0.4, Time=3.0s, Angle=90.0 deg)");
         handleMovementCommand(map, "0.4 3.0 90");
 
         System.out.println("\n>>> Step 3: Trigger Return To Home (RTH)");
@@ -91,7 +91,7 @@ public class RoMapConsoleSimulator {
     private static void handleMovementCommand(RoMap map, String input) {
         String[] parts = input.split("\\s+");
         if (parts.length < 3) {
-            System.out.println("❌ Invalid Format! Enter: <speed> <time> <angle> (e.g. '0.5 2.0 45') or 'RTH'");
+            System.out.println("[ERROR] Invalid Format! Enter: <speed> <time> <angle> (e.g. '0.5 2.0 45') or 'RTH'");
             return;
         }
 
@@ -101,26 +101,26 @@ public class RoMapConsoleSimulator {
             double angle = Double.parseDouble(parts[2]);
 
             if (speed < 0 || time < 0) {
-                System.out.println("⚠️ Warning: Speed and time should be non-negative values.");
+                System.out.println("[WARN] Speed and time should be non-negative values.");
             }
 
             map.updatePosition(angle, speed, time);
-            System.out.printf("✓ Moved: Speed=%.2f, Time=%.2fs, Angle=%.1f° | New Pos: %s%n",
+            System.out.printf("[OK] Moved: Speed=%.2f, Time=%.2fs, Angle=%.1f deg | New Pos: %s%n",
                     speed, time, angle, map.getCurrentPosition());
 
             drawFieldMap(map);
 
         } catch (NumberFormatException e) {
-            System.out.println("❌ Invalid Number Format! Please enter numeric values (e.g. '0.5 2.0 45').");
+            System.out.println("[ERROR] Invalid Number Format! Please enter numeric values (e.g. '0.5 2.0 45').");
         } catch (IllegalArgumentException e) {
-            System.out.println("⛔ Movement Blocked: " + e.getMessage());
+            System.out.println("[BLOCKED] Movement Blocked: " + e.getMessage());
         }
     }
 
     private static void handleReturnToHome(RoMap map, String input) {
         Position2D current = map.getCurrentPosition();
         if (current.distanceTo(HOME_POSITION) < 0.001) {
-            System.out.println("ℹ️ Robot is already at Home position (-6.0, -6.0)!");
+            System.out.println("[INFO] Robot is already at Home position (-6.0, -6.0)!");
             drawFieldMap(map);
             return;
         }
@@ -133,17 +133,17 @@ public class RoMapConsoleSimulator {
                 map.calculateDirectRoute(returnSpeed);
 
         String routeType = useEdgeRoute ? "Edge Perimeter Route" : "Direct Vector Route (As Crow Flies)";
-        System.out.printf("🚀 Initiating RTH via %s (%d step(s))...%n", routeType, returnRoute.size());
+        System.out.printf("[RTH] Initiating RTH via %s (%d step(s))...%n", routeType, returnRoute.size());
 
         for (int i = 0; i < returnRoute.size(); i++) {
             RoMap.MovementStep step = returnRoute.get(i);
-            System.out.printf("  [Step %d/%d] Heading: %.1f°, Speed: %.2f, Time: %.2fs (Dist: %.2fft)%n",
+            System.out.printf("  [Step %d/%d] Heading: %.1f deg, Speed: %.2f, Time: %.2fs (Dist: %.2fft)%n",
                     i + 1, returnRoute.size(), step.getHeadingDegrees(), step.speed, step.timeSeconds, step.distance);
 
             map.updatePosition(step.getHeadingDegrees(), step.speed, step.timeSeconds);
         }
 
-        System.out.printf("✅ Return To Home Complete! Current Pos: %s%n", map.getCurrentPosition());
+        System.out.printf("[OK] Return To Home Complete! Current Pos: %s%n", map.getCurrentPosition());
         drawFieldMap(map);
     }
 
@@ -233,17 +233,17 @@ public class RoMapConsoleSimulator {
         System.out.println("   RoMap & Position2D Interactive Console Sim   ");
         System.out.println("=================================================");
         System.out.println("Controls:");
-        System.out.println(" • Move: Enter '<speed> <time> <angle>' (e.g. '0.5 2.0 45')");
-        System.out.println(" • Return To Home: Enter 'RTH' or 'RTH edge'");
-        System.out.println(" • Reset Map: Enter 'RESET'");
-        System.out.println(" • Help: Enter 'HELP'");
-        System.out.println(" • Exit: Enter 'EXIT'");
+        System.out.println(" - Move: Enter '<speed> <time> <angle>' (e.g. '0.5 2.0 45')");
+        System.out.println(" - Return To Home: Enter 'RTH' or 'RTH edge'");
+        System.out.println(" - Reset Map: Enter 'RESET'");
+        System.out.println(" - Help: Enter 'HELP'");
+        System.out.println(" - Exit: Enter 'EXIT'");
     }
 
     private static void printHelp() {
         System.out.println("\n--- HELP MENU ---");
         System.out.println("1. Movement Command: '<speed> <time> <angle>'");
-        System.out.println("   Example: '0.8 3.5 90' moves at 0.8 speed for 3.5 sec at 90° heading.");
+        System.out.println("   Example: '0.8 3.5 90' moves at 0.8 speed for 3.5 sec at 90 deg heading.");
         System.out.println("2. Return To Home: 'RTH' or 'RTH direct'");
         System.out.println("   Calculates straight 'as-the-crow-flies' direct vector back to (-6, -6).");
         System.out.println("3. Edge Return: 'RTH edge'");

@@ -118,12 +118,25 @@ public class RoMap {
         return obstacles;
     }
 
+    public boolean isOutOfBounds() {
+        double boundaryLimit = fieldSizeMeters / 2.0;
+        return Math.abs(currentPosition.getX()) > boundaryLimit || Math.abs(currentPosition.getY()) > boundaryLimit;
+    }
+
     public void updatePosition(double headingDegrees, double speed, double timeSeconds) {
-        updatePosition(new Position2D(0, 0, headingDegrees), speed, timeSeconds);
+        updatePosition(headingDegrees, speed, timeSeconds, true);
+    }
+
+    public void updatePosition(Position2D stepDirection, double speed, double timeSeconds) {
+        updatePosition(stepDirection, speed, timeSeconds, true);
+    }
+
+    public void updatePosition(double headingDegrees, double speed, double timeSeconds, boolean enforceBoundary) {
+        updatePosition(new Position2D(0, 0, headingDegrees), speed, timeSeconds, enforceBoundary);
     }
 
     // Updates live position with vector calculations
-    public void updatePosition(Position2D stepDirection, double speed, double timeSeconds) {
+    public void updatePosition(Position2D stepDirection, double speed, double timeSeconds, boolean enforceBoundary) {
         MovementStep step = new MovementStep(stepDirection, speed, timeSeconds);
 
         double dx = step.distance * stepDirection.getCos();
@@ -131,10 +144,12 @@ public class RoMap {
 
         Position2D nextPosition = currentPosition.plus(dx, dy).rotateHeading(stepDirection.getHeadingDegrees() - currentPosition.getHeadingDegrees());
 
-        double boundaryLimit = fieldSizeMeters / 2.0;
-        if (Math.abs(nextPosition.getX()) > boundaryLimit || Math.abs(nextPosition.getY()) > boundaryLimit) {
-            throw new IllegalArgumentException(String.format(Locale.US,
-                "Movement exceeds field boundary limit (%.2f): %s", boundaryLimit, nextPosition));
+        if (enforceBoundary) {
+            double boundaryLimit = fieldSizeMeters / 2.0;
+            if (Math.abs(nextPosition.getX()) > boundaryLimit || Math.abs(nextPosition.getY()) > boundaryLimit) {
+                throw new IllegalArgumentException(String.format(Locale.US,
+                    "Movement exceeds field boundary limit (%.2f): %s", boundaryLimit, nextPosition));
+            }
         }
 
         currentPosition = nextPosition;
@@ -142,16 +157,18 @@ public class RoMap {
 
     // Alias for updating position
     public void recordMovement(double headingDegrees, double speed, double timeSeconds) {
-        updatePosition(headingDegrees, speed, timeSeconds);
+        updatePosition(headingDegrees, speed, timeSeconds, true);
     }
 
     public void recordMovement(Position2D stepDirection, double speed, double timeSeconds) {
-        updatePosition(stepDirection, speed, timeSeconds);
+        updatePosition(stepDirection, speed, timeSeconds, true);
     }
 
     //as crow flies
     public List<MovementStep> calculateDirectRoute(double speed) {
         List<MovementStep> steps = new ArrayList<>();
+        if (isOutOfBounds()) return steps; // RTH disabled if robot driven beyond field map
+
         double safeSpeed = (speed <= 0) ? 0.5 : speed;
         double distance = currentPosition.distanceTo(homePosition);
 
@@ -165,6 +182,7 @@ public class RoMap {
     //hug edge so no crash
     public List<MovementStep> calculateEdgeRoute(double speed) {
         List<MovementStep> steps = new ArrayList<>();
+        if (isOutOfBounds()) return steps; // RTH disabled if robot driven beyond field map
         double safeSpeed = (speed <= 0) ? 0.5 : speed;
 
         double edgeMargin = (fieldSizeMeters / 2.0) * 0.85; // Using configurable or constant safety margin
